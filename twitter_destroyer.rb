@@ -32,12 +32,12 @@ end
 
 Twitter.user_timeline(:me).each do |tweet|
   stored_tweet = AutoTweetDelete::Tweet.find_by_status_id(tweet['id'])
-  unless stored_tweet.nil? and stored_tweet['alived']
-    if expired?(stored_tweet.created_at)
-      Twitter.status_destroy(tweet['id'])
-      puts "deleted #{stored_tweet['status_id']}"
-      sleep 10
-    end
+  next if stored_tweet.nil?
+  next if stored_tweet['alived']
+  if expired?(stored_tweet.created_at)
+    Twitter.status_destroy(tweet['id'])
+    puts "deleted #{stored_tweet['status_id']}"
+    sleep 10
   end
 end
 
