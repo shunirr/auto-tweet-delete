@@ -1,12 +1,12 @@
 #!/usr/bin/env ruby
 # -*- encoding: utf-8 -*-
 
-$LOAD_PATH.unshift(File.dirname(__FILE__))
+$:.unshift './lib', './'
 
 require 'pit'
 require 'twitter'
 require 'active_record'
-require 'model/tweet'
+require 'auto_tweet_delete'
 
 ActiveRecord::Base.establish_connection(
   adapter:  "sqlite3",
@@ -28,10 +28,10 @@ Twitter.configure do |config|
 end
 
 Twitter.user_timeline(:me).each do |tweet|
-  if TwitterCrawler::Tweet.find_by_status_id(tweet['id']).nil? then
-    TwitterCrawler::Tweet.create(status_id:  tweet['id'],
-                                 created_at: tweet['created_at'],
-                                 text:       tweet['text'])
+  if AutoTweetDelete::Tweet.find_by_status_id(tweet['id']).nil? then
+    AutoTweetDelete::Tweet.create(status_id:  tweet['id'],
+                                  created_at: tweet['created_at'],
+                                  text:       tweet['text'])
   end
 end
 
