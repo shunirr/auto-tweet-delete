@@ -26,7 +26,7 @@ Twitter.configure do |config|
 end
 
 def expired?(created_at)
-  expire_time = ((Time.now - stored_tweet.created_at) / 3600).to_i
+  expire_time = ((Time.now - created_at) / 3600).to_i
   expire_time >= 1
 end
 
