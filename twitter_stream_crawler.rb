@@ -18,10 +18,8 @@ module EventMachine
   end
 end
 
-ActiveRecord::Base.establish_connection(
-  adapter:  "sqlite3",
-  database: "db/tweets.sqlite"
-)
+ActiveRecord::Base.configurations = YAML.load(File.open('database.yml'))
+ActiveRecord::Base.establish_connection(ActiveRecord::Base.configurations)
 
 pit = Pit.get("twitter", :require => {
   'consumer_key'        => "YOUR_CONSUMER_KEY",
