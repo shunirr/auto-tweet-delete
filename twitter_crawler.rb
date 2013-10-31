@@ -30,6 +30,7 @@ Twitter.user_timeline(:me).each do |tweet|
     AutoTweetDelete::Tweet.create(status_id:  tweet['id'],
                                   created_at: tweet['created_at'],
                                   text:       tweet['text'])
+    puts "added #{tweet.id}"
   end
 end
 
