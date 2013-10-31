@@ -7,7 +7,6 @@ class Tweets < ActiveRecord::Migration
       t.integer  :status_id
       t.datetime :created_at
       t.text     :text
-      t.boolean  :retweeted, :default => false
       t.boolean  :alived, :default => false
     end
   end

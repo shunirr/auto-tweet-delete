@@ -25,11 +25,15 @@ Twitter.configure do |config|
   config.oauth_token_secret = pit['access_token_secret']
 end
 
+def expired?(created_at)
+  expire_time = ((Time.now - stored_tweet.created_at) / 3600).to_i
+  expire_time >= 1
+end
+
 Twitter.user_timeline(:me).each do |tweet|
   stored_tweet = AutoTweetDelete::Tweet.find_by_status_id(tweet['id'])
   unless stored_tweet.nil? and stored_tweet['alived']
-    expire_time = ((Time.now - stored_tweet.created_at) / 3600).to_i
-    if expire_time >= 1
+    if expired?(stored_tweet.created_at)
       Twitter.status_destroy(tweet['id'])
       puts "deleted #{stored_tweet['status_id']}"
       sleep 10
