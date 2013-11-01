@@ -28,8 +28,13 @@ Twitter.configure do |config|
 end
 
 def expired?(created_at)
-  expire_time = ((Time.now - created_at) / 3600).to_i
-  expire_time >= 1
+  expire_time = ((Time.now - created_at) / 3600).to_f
+  expire_time >= 1.0
+end
+
+def yuueki?(text)
+  body = Net::HTTP.get('api.s5r.jp', "/yuueki?q=#{URI.encode(text)}")
+  body == 'true'
 end
 
 Twitter.user_timeline(:me).each do |tweet|
@@ -39,11 +44,12 @@ Twitter.user_timeline(:me).each do |tweet|
   next if stored_tweet['alived']
   next unless expired?(stored_tweet.created_at)
 
-  yuueki = Net::HTTP.get('api.s5r.jp', "/yuueki?q=#{URI.encode(stored_tweet.text)}")
-  next if yuueki == 'true'
-
-  Twitter.status_destroy(tweet['id'])
-  puts "deleted #{stored_tweet['status_id']}"
-  sleep 10
+  if yuueki?(stored_tweet.text) then
+    stored_tweet.update_attribute(:alived, true)
+  else
+    Twitter.status_destroy(tweet['id'])
+    puts "deleted #{stored_tweet['status_id']}"
+    sleep 10
+  end
 end
 
