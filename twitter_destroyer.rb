@@ -8,6 +8,7 @@ require 'twitter'
 require 'active_record'
 require 'auto_tweet_delete'
 require 'net/http'
+require 'uri'
 
 ActiveRecord::Base.configurations = YAML.load(File.open('database.yml'))
 ActiveRecord::Base.establish_connection(ActiveRecord::Base.configurations)
@@ -38,7 +39,7 @@ Twitter.user_timeline(:me).each do |tweet|
   next if stored_tweet['alived']
   next unless expired?(stored_tweet.created_at)
 
-  yuueki = Net::HTTP.get('api.s5r.jp', "/yuueki?q=#{stored_tweet.status}")
+  yuueki = Net::HTTP.get('api.s5r.jp', "/yuueki?q=#{URI.encode(stored_tweet.text)}")
   next unless yuueki.include?('true')
 
   Twitter.status_destroy(tweet['id'])
