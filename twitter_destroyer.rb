@@ -40,7 +40,7 @@ Twitter.user_timeline(:me).each do |tweet|
   next unless expired?(stored_tweet.created_at)
 
   yuueki = Net::HTTP.get('api.s5r.jp', "/yuueki?q=#{URI.encode(stored_tweet.text)}")
-  next unless yuueki.include?('true')
+  next if yuueki == 'true'
 
   Twitter.status_destroy(tweet['id'])
   puts "deleted #{stored_tweet['status_id']}"
