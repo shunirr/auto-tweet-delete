@@ -25,7 +25,7 @@ Twitter.configure do |config|
   config.oauth_token_secret = pit['access_token_secret']
 end
 
-Twitter.user_timeline(:me).each do |tweet|
+Twitter.user_timeline(:me, :count => 200).each do |tweet|
   if AutoTweetDelete::Tweet.find_by_status_id(tweet['id']).nil? then
     AutoTweetDelete::Tweet.create(status_id:  tweet['id'],
                                   created_at: tweet['created_at'],

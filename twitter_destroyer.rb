@@ -37,7 +37,7 @@ def yuueki?(text)
   body == 'true'
 end
 
-Twitter.user_timeline(:me).each do |tweet|
+Twitter.user_timeline(:me, :count => 200).each do |tweet|
   stored_tweet = AutoTweetDelete::Tweet.find_by_status_id(tweet['id'])
 
   next if stored_tweet.nil?
