@@ -25,12 +25,18 @@ Twitter.configure do |config|
   config.oauth_token_secret = pit['access_token_secret']
 end
 
-Twitter.user_timeline(:me, :count => 200).each do |tweet|
-  if AutoTweetDelete::Tweet.find_by_status_id(tweet['id']).nil? then
-    AutoTweetDelete::Tweet.create(status_id:  tweet['id'],
-                                  created_at: tweet['created_at'],
-                                  text:       tweet['text'])
-    puts "added #{tweet.id}"
+ttl = 2
+begin
+  Twitter.user_timeline(:me, :count => 200).each do |tweet|
+    if AutoTweetDelete::Tweet.find_by_status_id(tweet['id']).nil? then
+      AutoTweetDelete::Tweet.create(status_id:  tweet['id'],
+                                    created_at: tweet['created_at'],
+                                    text:       tweet['text'])
+      puts "added #{tweet.id}"
+    end
   end
+rescue => e
+  sleep 10
+  ttl -= 1
+  retry if ttl > 0
 end
-

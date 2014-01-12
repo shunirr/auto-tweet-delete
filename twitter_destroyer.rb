@@ -37,19 +37,25 @@ def yuueki?(text)
   body == 'true'
 end
 
-Twitter.user_timeline(:me, :count => 200).each do |tweet|
-  stored_tweet = AutoTweetDelete::Tweet.find_by_status_id(tweet['id'])
-
-  next if stored_tweet.nil?
-  next if stored_tweet['alived']
-  next unless expired?(stored_tweet.created_at)
-
-  if yuueki?(stored_tweet.text) then
-    stored_tweet.update_attribute(:alived, true)
-  else
-    Twitter.status_destroy(tweet['id'])
-    puts "deleted #{stored_tweet['status_id']}"
-    sleep 10
+ttl = 2
+begin
+  Twitter.user_timeline(:me, :count => 200).each do |tweet|
+    stored_tweet = AutoTweetDelete::Tweet.find_by_status_id(tweet['id'])
+  
+    next if stored_tweet.nil?
+    next if stored_tweet['alived']
+    next unless expired?(stored_tweet.created_at)
+  
+    if yuueki?(stored_tweet.text) then
+      stored_tweet.update_attribute(:alived, true)
+    else
+      Twitter.status_destroy(tweet['id'])
+      puts "deleted #{stored_tweet['status_id']}"
+      sleep 10
+    end
   end
+rescue => e
+  sleep 10
+  ttl -= 1
+  retry if ttl > 0
 end
-
