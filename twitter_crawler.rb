@@ -18,7 +18,7 @@ pit = Pit.get("twitter", :require => {
   'access_token_secret' => "YOUR_ACCESS_SECRET"
 })
 
-Twitter.configure do |config|
+client = Twitter::REST::Client.new do |config|
   config.consumer_key       = pit['consumer_key']
   config.consumer_secret    = pit['consumer_secret']
   config.oauth_token        = pit['access_token']
@@ -27,7 +27,7 @@ end
 
 ttl = 2
 begin
-  Twitter.user_timeline(:me, :count => 200).each do |tweet|
+  client.user_timeline(:me, :count => 200).each do |tweet|
     if AutoTweetDelete::Tweet.find_by_status_id(tweet['id']).nil? then
       AutoTweetDelete::Tweet.create(status_id:  tweet['id'],
                                     created_at: tweet['created_at'],
