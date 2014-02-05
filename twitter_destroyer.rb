@@ -32,11 +32,6 @@ def expired?(created_at)
   expire_time >= 1.0
 end
 
-def yuueki?(text)
-  body = Net::HTTP.get('api.s5r.jp', "/yuueki?q=#{URI.encode(text)}")
-  body == 'true'
-end
-
 ttl = 2
 begin
   client.user_timeline(:me, :count => 200).each do |tweet|
@@ -46,13 +41,9 @@ begin
     next if stored_tweet['alived']
     next unless expired?(stored_tweet.created_at)
   
-    if yuueki?(stored_tweet.text) then
-      stored_tweet.update_attribute(:alived, true)
-    else
-      client.destroy_status(tweet['id'])
-      puts "deleted #{stored_tweet['status_id']}"
-      sleep 10
-    end
+    client.destroy_status(tweet['id'])
+    puts "deleted #{stored_tweet['status_id']}"
+    sleep 10
   end
 rescue => e
   sleep 10
